@@ -153,10 +153,10 @@ function set_mu(Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
     mu = zeros(cellxmax, cellymax)
 
     # サザーランドの式
-    # https://www.jstage.jst.go.jp/article/jsam1937/37/4/37_4_694/_pdf/-char/ja
-    mu0 = 1.82e-5 # 基準粘度[Pa s]
+    # https://cattech-lab.com/science-tools/sutherland/
+    mu0 = 1.82e-5     # 基準粘度[Pa s]
     T0 = 293.15       # 基準温度[K]
-    C = 117       # サザーランド定数[K]
+    C = 117           # サザーランド定数[K]
     
     for j in 1:cellymax
         for i in 1:cellxmax
@@ -174,9 +174,10 @@ function set_lambda(Qbase, cellxmax, cellymax, mu, specific_heat_ratio, Rd)
     lambda = zeros(cellxmax, cellymax)
     
     # サザーランドの式
+    # https://doi.org/10.11357/jsam1937.37.694
     lam0 = 22.3*10^(-3)  # 基準熱伝導率　[W/mK]
-    T0 = 273.15       # 基準温度[K]
-    C = 125       # サザーランド定数[K]
+    T0 = 273.15          # 基準温度[K]
+    C = 125              # サザーランド定数[K]
 
     for j in 1:cellymax
         for i in 1:cellxmax
