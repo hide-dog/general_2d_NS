@@ -1,5 +1,4 @@
-function set_volume(nodes, cellxmax, cellymax)
-    volume = zeros(cellxmax, cellymax)
+function set_volume(nodes, cellxmax, cellymax, volume)
     for j in 1:cellymax
         for i in 1:cellxmax
             vec_r1x = nodes[i+1,j+1,1] - nodes[i,j,1]
@@ -13,10 +12,10 @@ function set_volume(nodes, cellxmax, cellymax)
     return volume
 end 
 
-function set_dx_lts(nodes, cellxmax, cellymax)
+function set_dx_lts(dx, dy, nodes, cellxmax, cellymax)
     # 境界で定義
-    dx = zeros(cellxmax+1, cellymax)
-    dy = zeros(cellxmax, cellymax+1)
+    # dx = zeros(cellxmax+1, cellymax)
+    # dy = zeros(cellxmax, cellymax+1)
     
     for j in 2:cellymax -1
         for i in 2:cellxmax+1 -1
@@ -217,3 +216,59 @@ function set_Minf(bdcon, specific_heat_ratio, Rd)
     return M
 end
 
+
+function base_to_conservative(Qbase, Qcon, cellxmax, cellymax, specific_heat_ratio)
+    """
+    Qbase=[rho,u,v,p]
+    Qcon=[rho,rhou,rhov,e]
+    """ 
+    
+    for j in 1:cellymax
+        for i in 1:cellxmax
+            Qcon[i,j,1] = Qbase[i,j,1]
+            Qcon[i,j,2] = Qbase[i,j,1]*Qbase[i,j,2]
+            Qcon[i,j,3] = Qbase[i,j,1]*Qbase[i,j,3]
+            Qcon[i,j,4] = Qbase[i,j,4]/(specific_heat_ratio-1)+Qbase[i,j,1]*(Qbase[i,j,2]^2+Qbase[i,j,3]^2)/2
+        end
+    end
+    return Qcon
+end
+
+function conservative_to_base(Qbase, Qcon, cellxmax, cellymax, specific_heat_ratio)
+    """
+    Qbase=[rho,u,v,p]
+    Qcon=[rho,rhou,rhov,e]
+    """
+
+    for j in 1:cellymax
+        for i in 1:cellxmax
+            Qbase[i,j,1] = Qcon[i,j,1]
+            Qbase[i,j,2] = Qcon[i,j,2]/Qcon[i,j,1]
+            Qbase[i,j,3] = Qcon[i,j,3]/Qcon[i,j,1]
+            Qbase[i,j,4] = (Qcon[i,j,4]-Qcon[i,j,1]*(Qbase[i,j,2]^2+Qbase[i,j,3]^2)/2)*(specific_heat_ratio-1)
+        end
+    end
+    return Qbase
+end
+
+function setup_Qcon_hat(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
+    for l in 1:nval
+        for j in 1:cellymax
+            for i in 1:cellxmax
+                Qcon_hat[i,j,l] = Qcon[i,j,l] * volume[i,j]
+            end
+        end
+    end
+    return Qcon_hat
+end
+
+function Qhat_to_Q(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
+    for l in 1:nval
+        for j in 1:cellymax
+            for i in 1:cellxmax
+                Qcon[i,j,l] = Qcon_hat[i,j,l] / volume[i,j]
+            end
+        end
+    end
+    return Qcon
+end

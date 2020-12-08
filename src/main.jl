@@ -16,15 +16,18 @@ function main()
     out_file_front, out_ext, restartnum, restart_file, init_small, norm_ok,
     time_integ, nt, dt, every_outnum, in_nt, dtau, cfl,
     init_rho, init_u, init_v, init_p, init_T, specific_heat_ratio, Rd, bdcon = input_para(PARAMDAT)
+    
+    cellxmax = xmax - 1
+    cellymax = ymax - 1
 
-    init_p = init_rho*Rd*init_T
+    common_allocation(cellxmax, cellymax, nval)
 
-    Qbase, cellxmax, cellymax, restartnum = set_initQbase(xmax, ymax, restart_file, init_rho, init_u, init_v, init_p, init_T,
-                                                        specific_heat_ratio, out_file_front, out_ext, out_dir, restartnum, Rd, nval)
+    Qbase, restartnum = set_initQbase(Qbase, cellxmax, cellymax, restart_file, init_rho, init_u, init_v, init_p, init_T,
+                                      specific_heat_ratio, out_file_front, out_ext, out_dir, restartnum, Rd, nval)
     
     # init Delta_Qcon_hat
-    volume = set_volume(nodes, cellxmax, cellymax)
-    dx, dy = set_dx_lts(nodes, cellxmax, cellymax)
+    volume = set_volume(nodes, cellxmax, cellymax, volume)
+    dx, dy = set_dx_lts(dx, dy, nodes, cellxmax, cellymax)
     reset_write(fwrite)
 
     # main loop
@@ -45,8 +48,8 @@ function main()
             # exlicit scheme
             
             Qbase    = set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, specific_heat_ratio, nval)
-            Qcon     = base_to_conservative(Qbase, cellxmax, cellymax, specific_heat_ratio, nval)
-            Qcon_hat = setup_Qcon_hat(Qcon, cellxmax, cellymax, volume, nval)
+            Qcon     = base_to_conservative(Qbase, Qcon, cellxmax, cellymax, specific_heat_ratio)
+            Qcon_hat = setup_Qcon_hat(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
             
             # initial_setup
             mu     = set_mu(Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
@@ -66,15 +69,15 @@ function main()
             # time integral
             Qcon_hat = time_integration_explicit(dt, Qcon_hat, RHS, cellxmax, cellymax, nval)
 
-            Qcon  = Qhat_to_Q(Qcon_hat, cellxmax, cellymax, volume, nval)
-            Qbase = conservative_to_base(Qcon, cellxmax, cellymax, specific_heat_ratio, nval)
+            Qcon  = Qhat_to_Q(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
+            Qbase = conservative_to_base(Qbase, Qcon, cellxmax, cellymax, specific_heat_ratio)
 
         elseif time_integ == "2"
             output_physicaltime(fwrite, t, dt)
             # Qcn
             Qbasen    = copy(Qbase)
-            Qconn     = base_to_conservative(Qbasen, cellxmax, cellymax, specific_heat_ratio, nval)
-            Qconn_hat = setup_Qcon_hat(Qconn, cellxmax, cellymax, volume, nval)
+            Qconn     = base_to_conservative(Qbasen, Qconn, cellxmax, cellymax, specific_heat_ratio)
+            Qconn_hat = setup_Qcon_hat(Qconn, Qconn_hat, cellxmax, cellymax, volume, nval)
 
             Qbasem = copy(Qbase)
 
@@ -82,8 +85,8 @@ function main()
                 # LHS (A_adv_hat=jacobian)
                 Qbasem = set_boundary(Qbasem, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, specific_heat_ratio, nval)
                 
-                Qcon     = base_to_conservative(Qbasem, cellxmax, cellymax, specific_heat_ratio, nval)
-                Qcon_hat = setup_Qcon_hat(Qcon, cellxmax, cellymax, volume, nval)
+                Qcon     = base_to_conservative(Qbasem, Qcon, cellxmax, cellymax, specific_heat_ratio)
+                Qcon_hat = setup_Qcon_hat(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
 
                 # initial_setup
                 mu     = set_mu(Qbasem, cellxmax, cellymax, specific_heat_ratio, Rd)
@@ -137,8 +140,8 @@ function main()
                     end
                 end
 
-                Qcon = Qhat_to_Q(Qcon_hat, cellxmax, cellymax, volume, nval)
-                Qbasem = conservative_to_base(Qcon, cellxmax, cellymax, specific_heat_ratio, nval)
+                Qcon = Qhat_to_Q(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
+                Qbasem = conservative_to_base(Qbasem, Qcon, cellxmax, cellymax, specific_heat_ratio)
 
             end            
             Qbase = copy(Qbasem)

@@ -1,11 +1,8 @@
-function set_initQbase(xmax, ymax, restart_file, init_rho, init_u, init_v, init_p, init_T,
-                        specific_heat_ratio, out_file_front, out_ext, out_dir, restart_num, Rd, nval)
-    Qbase=[]
-    cellxmax = xmax - 1
-    cellymax = ymax - 1
+function set_initQbase(Qbase, cellxmax, cellymax, restart_file, init_rho, init_u, init_v, init_p, init_T,
+                    specific_heat_ratio, out_file_front, out_ext, out_dir, restartnum, Rd, nval)
 
     restart_check = 0
-    try Qbase = setup_restart_value(cellxmax, cellymax, out_dir, restart_file, nval)
+    try Qbase = setup_restart_value(Qbase, cellxmax, cellymax, out_dir, restart_file, nval)
         println("Restart "*restart_file)
         restart_check = 2
     catch 
@@ -13,7 +10,7 @@ function set_initQbase(xmax, ymax, restart_file, init_rho, init_u, init_v, init_
     end
 
     if restart_check == 1
-        Qbase = setup_init_value(cellxmax, cellymax, init_rho, init_u, init_v, init_p, init_T, nval)
+        Qbase = setup_init_value(Qbase, cellxmax, cellymax, init_rho, init_u, init_v, init_p)
         println("Start Initial condition")
         restart_num = 0
         output_result(0, Qbase, cellxmax, cellymax, specific_heat_ratio, out_file_front, out_ext, out_dir, Rd, nval)
@@ -22,8 +19,7 @@ function set_initQbase(xmax, ymax, restart_file, init_rho, init_u, init_v, init_
     return Qbase, cellxmax, cellymax, restart_num
 end
 
-function setup_init_value(cellxmax, cellymax, init_rho, init_u, init_v, init_p, init_T, nval)
-    Qbase=zeros(cellxmax, cellymax, nval)
+function setup_init_value(Qbase, cellxmax, cellymax, init_rho, init_u, init_v, init_p)
     for j in 1:cellymax
         for i in 1:cellxmax
             Qbase[i,j,1] = init_rho
@@ -35,9 +31,7 @@ function setup_init_value(cellxmax, cellymax, init_rho, init_u, init_v, init_p, 
     return Qbase
 end
 
-function setup_restart_value(cellxmax, cellymax, out_dir, restart_file, nval)
-    Qbase = zeros(cellxmax, cellymax, nval)
-
+function setup_restart_value(Qbase, cellxmax, cellymax, out_dir, restart_file, nval)
     skipnum = 1
     fff = []
     open("result/"*restart_file, "r") do f
