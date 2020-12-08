@@ -1,6 +1,4 @@
-function AUSM_plus(Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_ratio, volume, nval)
-    E_adv_hat = zeros(cellxmax+1,   cellymax, nval)
-    F_adv_hat = zeros(  cellxmax, cellymax+1, nval)
+function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_ratio, volume, nval)
     g         = specific_heat_ratio
     
     for j in 2:cellymax -1

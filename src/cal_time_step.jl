@@ -9,14 +9,9 @@ function time_integration_explicit(dt, Qcon_hat, RHS, cellxmax, cellymax, nval)
     return Qcon_hat
 end 
 
-function one_wave(Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_ratio, volume, nval)
+function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shig, B_beta_shig,
+                    Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_ratio, volume, nval)
     # セル中心のonewave
-    A_adv_hat_p = zeros(cellxmax, cellymax, nval, nval)
-    A_adv_hat_m = zeros(cellxmax, cellymax, nval, nval)
-    B_adv_hat_p = zeros(cellxmax, cellymax, nval, nval)
-    B_adv_hat_m = zeros(cellxmax, cellymax, nval, nval)
-    A_beta_shig = zeros(cellxmax, cellymax)
-    B_beta_shig = zeros(cellxmax, cellymax)
     beta = 1.1
 
     for j in 2:cellymax
@@ -97,10 +92,9 @@ function one_wave(Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_r
     return A_adv_hat_p, A_adv_hat_m, B_adv_hat_p, B_adv_hat_m, A_beta_shig, B_beta_shig
 end
 
-function central_diff_jacobian(Qbase, Qcon, cellxmax, cellymax, mu, lambda, vecAx, vecAy, specific_heat_ratio, volume, nval)
-    jalphaP = zeros(cellxmax, cellymax)
-    jbetaP  = zeros(cellxmax, cellymax)
-
+function central_diff_jacobian(jalphaP, jbetaP, Qbase, Qcon, cellxmax, cellymax, mu, lambda,
+                            vecAx, vecAy, specific_heat_ratio, volume, nval)
+    
     # 角セルの処理
     Qbase[1,1,1] = 1.0
     Qbase[cellxmax,1,1] = 1.0

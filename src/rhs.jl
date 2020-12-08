@@ -1,6 +1,5 @@
-function setup_RHS(cellxmax, cellymax, E_adv_hat, F_adv_hat, E_vis_hat, F_vis_hat, nval, volume)
-    RHS = zeros(cellxmax, cellymax, nval)
-    for l in 1:nval
+function setup_RHS(RHS, cellxmax, cellymax, E_adv_hat, F_adv_hat, E_vis_hat, F_vis_hat, nval, volume)
+    Threads.@threads for l in 1:nval
         for j in 2:cellymax-1
             for i in 2:cellxmax-1
                 RHS[i,j,l] = - (E_adv_hat[i+1,  j, l] - E_vis_hat[i+1,  j, l]) +

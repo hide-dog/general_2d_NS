@@ -1,8 +1,5 @@
-function central_diff(Qbase, Qcon, cellxmax, cellymax, mu, lambda,
+function central_diff(E_vis_hat, F_vis_hat, Qbase, Qcon, cellxmax, cellymax, mu, lambda,
                         vecAx, vecAy, specific_heat_ratio, volume, Rd, nval)
-
-    E_vis_hat = zeros(cellxmax+1,   cellymax, nval)
-    F_vis_hat = zeros(  cellxmax, cellymax+1, nval)
     
     for j in 2:cellymax -1
         for i in 2:cellxmax+1 -1

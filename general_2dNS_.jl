@@ -1,6 +1,6 @@
 # src path
 src_path = "C:\\Users\\xxxx\\Desktop\\git\\general_2d_NS\\src\\"
-
+src_path = "C:\\Users\\hidee\\Desktop\\git\\general_2d_NS\\src\\"
 # main (変更しないこと)
 src_read="read_grid.jl"
 include(src_path*src_read)
@@ -24,7 +24,7 @@ include(src_path*src_read)
 src_read="viscos.jl"
 include(src_path*src_read)
 
-src_read="setup.jl"
+src_read="allocation.jl"
 include(src_path*src_read)
 src_read="cal_time_step.jl"
 include(src_path*src_read)

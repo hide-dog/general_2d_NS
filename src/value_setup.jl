@@ -96,10 +96,8 @@ function set_dx_lts(dx, dy, nodes, cellxmax, cellymax)
     return dx, dy
 end
 
-function set_lts(Qbase, cellxmax, cellymax, mu, dx, dy, vecAx, vecAy, volume, specific_heat_ratio, cfl)
-    dtau = zeros(cellxmax, cellymax)
-    lambda_facex = zeros(cellxmax+1, cellymax)
-    lambda_facey = zeros(cellxmax, cellymax+1)
+function set_lts(dtau, lambda_facex, lambda_facey, Qbase, cellxmax, cellymax, mu, dx, dy,
+                vecAx, vecAy, volume, specific_heat_ratio, cfl)
     g = specific_heat_ratio
     
     for j in 2:cellymax -1
@@ -148,9 +146,7 @@ function set_lts(Qbase, cellxmax, cellymax, mu, dx, dy, vecAx, vecAy, volume, sp
     return dtau
 end
 
-function set_mu(Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
-    mu = zeros(cellxmax, cellymax)
-
+function set_mu(mu, Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
     # サザーランドの式
     # https://cattech-lab.com/science-tools/sutherland/
     mu0 = 1.82e-5     # 基準粘度[Pa s]
@@ -168,10 +164,7 @@ function set_mu(Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
 end
 
 
-function set_lambda(Qbase, cellxmax, cellymax, mu, specific_heat_ratio, Rd)
-    
-    lambda = zeros(cellxmax, cellymax)
-    
+function set_lambda(lambda, Qbase, cellxmax, cellymax, mu, specific_heat_ratio, Rd)
     # サザーランドの式
     # https://doi.org/10.11357/jsam1937.37.694
     lam0 = 22.3*10^(-3)  # 基準熱伝導率　[W/mK]

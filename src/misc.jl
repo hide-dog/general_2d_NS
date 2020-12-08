@@ -12,11 +12,11 @@ function set_initQbase(Qbase, cellxmax, cellymax, restart_file, init_rho, init_u
     if restart_check == 1
         Qbase = setup_init_value(Qbase, cellxmax, cellymax, init_rho, init_u, init_v, init_p)
         println("Start Initial condition")
-        restart_num = 0
+        restartnum = 0
         output_result(0, Qbase, cellxmax, cellymax, specific_heat_ratio, out_file_front, out_ext, out_dir, Rd, nval)
     end
 
-    return Qbase, cellxmax, cellymax, restart_num
+    return Qbase, restartnum
 end
 
 function setup_init_value(Qbase, cellxmax, cellymax, init_rho, init_u, init_v, init_p)
