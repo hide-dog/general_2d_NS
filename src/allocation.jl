@@ -1,53 +1,61 @@
+# ------------------------------------
+# Secure the array for explicit and implicit
+# ------------------------------------
 function common_allocation(cellxmax, cellymax, nval)
+    # define at cell center
+    Qbase  = zeros(cellxmax, cellymax, nval)           # primitive variables
+    volume = zeros(cellxmax, cellymax)                 # volume
+
+    Qcon     = zeros(cellxmax, cellymax, nval)         # conserved variables
+    Qcon_hat = zeros(cellxmax, cellymax, nval)         # conserved variables in the general coordinate system
+
+    mu     = zeros(cellxmax, cellymax)                 # viscosity
+    lambda = zeros(cellxmax, cellymax)                 # thermal Conductivity
+
+    RHS = zeros(cellxmax, cellymax, nval)              # right hand side
     
-    Qbase = zeros(cellxmax, cellymax, nval)
-    volume = zeros(cellxmax, cellymax)
-    
-    dx = zeros(cellxmax+1, cellymax)
-    dy = zeros(cellxmax, cellymax+1)
+    # define at cell boundaries
+    dx = zeros(cellxmax+1, cellymax)                   # distance from cell center
+    dy = zeros(cellxmax, cellymax+1)                   # distance from cell center
 
-    Qcon = zeros(cellxmax, cellymax, nval)
-    Qcon_hat = zeros(cellxmax, cellymax, nval)
+    E_adv_hat = zeros(cellxmax+1,   cellymax, nval)    # flux of advection in the x-direction
+    F_adv_hat = zeros(  cellxmax, cellymax+1, nval)    # flux of advection in the y-direction
 
-    mu = zeros(cellxmax, cellymax)
-    lambda = zeros(cellxmax, cellymax)
-
-    E_adv_hat = zeros(cellxmax+1,   cellymax, nval)
-    F_adv_hat = zeros(  cellxmax, cellymax+1, nval)
-
-    E_vis_hat = zeros(cellxmax+1,   cellymax, nval)
-    F_vis_hat = zeros(  cellxmax, cellymax+1, nval)
-
-    RHS = zeros(cellxmax, cellymax, nval)
+    E_vis_hat = zeros(cellxmax+1,   cellymax, nval)    # flux of viscosity in the x-direction
+    F_vis_hat = zeros(  cellxmax, cellymax+1, nval)    # flux of viscosity in the y-direction
 
     return Qbase, volume, dx, dy, Qcon, Qcon_hat, mu, lambda, 
             E_adv_hat, F_adv_hat, E_vis_hat, F_vis_hat, RHS
 end 
 
 function allocation_implicit(cellxmax, cellymax, nval)
-    Qbasen = zeros(cellxmax, cellymax, nval)
-    Qconn  = zeros(cellxmax, cellymax, nval)
-    Qconn_hat  = zeros(cellxmax, cellymax, nval)
-    Qbasem  = zeros(cellxmax, cellymax, nval)
+    # define at cell center
+    Qbasen     = zeros(cellxmax, cellymax, nval)        # primitive variables for inner iteration
+    Qconn      = zeros(cellxmax, cellymax, nval)        # conserved variables for inner iteration
+    Qconn_hat  = zeros(cellxmax, cellymax, nval)        # conserved variables in general coordinate system for inner iteration
+    Qbasem     = zeros(cellxmax, cellymax, nval)        # primitive variables for inner iteration
 
-    dtau = zeros(cellxmax, cellymax)
-    lambda_facex = zeros(cellxmax+1, cellymax)
-    lambda_facey = zeros(cellxmax, cellymax+1)
+    dtau         = zeros(cellxmax, cellymax)            # computational time steps
 
-    A_adv_hat_p = zeros(cellxmax, cellymax, nval, nval)
-    A_adv_hat_m = zeros(cellxmax, cellymax, nval, nval)
-    B_adv_hat_p = zeros(cellxmax, cellymax, nval, nval)
-    B_adv_hat_m = zeros(cellxmax, cellymax, nval, nval)
-    A_beta_shig = zeros(cellxmax, cellymax)
-    B_beta_shig = zeros(cellxmax, cellymax)
+    A_adv_hat_p = zeros(cellxmax, cellymax, nval, nval) # Jacobian matrix A+ for one-wave approximation
+    A_adv_hat_m = zeros(cellxmax, cellymax, nval, nval) # Jacobian matrix A- for one-wave approximation
+    B_adv_hat_p = zeros(cellxmax, cellymax, nval, nval) # Jacobian matrix B+ for one-wave approximation
+    B_adv_hat_m = zeros(cellxmax, cellymax, nval, nval) # Jacobian matrix B- for one-wave approximation
+    A_beta_shig = zeros(cellxmax, cellymax)             # A sigma for one-wave approximation
+    B_beta_shig = zeros(cellxmax, cellymax)             # B sigma for one-wave approximation
 
-    jalphaP = zeros(cellxmax, cellymax)
-    jbetaP  = zeros(cellxmax, cellymax)
+    jalphaP = zeros(cellxmax, cellymax)                 # Jacobian matrix for viscosity
+    jbetaP  = zeros(cellxmax, cellymax)                 # Jacobian matrix for viscosity
 
-    delta_Q = zeros(cellxmax, cellymax, nval)
-    delta_Q_temp = zeros(cellxmax, cellymax, nval)
+    delta_Q      = zeros(cellxmax, cellymax, nval)      # delta Q for lusgs
+    delta_Q_temp = zeros(cellxmax, cellymax, nval)      # delta Q for lusgs
 
-    norm2 = zeros(nval)
+    # define at cell boundaries
+    lambda_facex = zeros(cellxmax+1, cellymax)          # lambda for computational time steps
+    lambda_facey = zeros(cellxmax, cellymax+1)          # lambda for computational time steps
+
+    # misc
+    norm2 = zeros(nval)                                 # Residuals by norm-2
 
     return Qbasen, Qconn, Qconn_hat, Qbasem, dtau, lambda_facex, lambda_facey,
             A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shig, B_beta_shig,
