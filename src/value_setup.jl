@@ -1,3 +1,6 @@
+# ------------------------------------
+# set volume
+# ------------------------------------
 function set_volume(nodes, cellxmax, cellymax, volume)
     for j in 1:cellymax
         for i in 1:cellxmax
@@ -12,8 +15,11 @@ function set_volume(nodes, cellxmax, cellymax, volume)
     return volume
 end 
 
+# ------------------------------------
+# set dx and dy for local time stepping
+# ------------------------------------
 function set_dx_lts(dx, dy, nodes, cellxmax, cellymax)
-    # 境界で定義
+    # define at cell boundaries
     # dx = zeros(cellxmax+1, cellymax)
     # dy = zeros(cellxmax, cellymax+1)
     
@@ -96,6 +102,9 @@ function set_dx_lts(dx, dy, nodes, cellxmax, cellymax)
     return dx, dy
 end
 
+# ------------------------------------
+# set dtau for local time stepping
+# ------------------------------------
 function set_lts(dtau, lambda_facex, lambda_facey, Qbase, cellxmax, cellymax, mu, dx, dy,
                 vecAx, vecAy, volume, specific_heat_ratio, cfl)
     g = specific_heat_ratio
@@ -146,12 +155,14 @@ function set_lts(dtau, lambda_facex, lambda_facey, Qbase, cellxmax, cellymax, mu
     return dtau
 end
 
+# ------------------------------------
+# set viscosity by Sutherland's formula
+# https://cattech-lab.com/science-tools/sutherland/
+# ------------------------------------
 function set_mu(mu, Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
-    # サザーランドの式
-    # https://cattech-lab.com/science-tools/sutherland/
-    mu0 = 1.82e-5     # 基準粘度[Pa s]
-    T0 = 293.15       # 基準温度[K]
-    C = 117           # サザーランド定数[K]
+    mu0 = 1.82e-5     # Reference Viscosity, Pa s
+    T0  = 293.15      # Reference Temperature, K
+    C   = 117         # Sutherland's constant, K
     
     for j in 1:cellymax
         for i in 1:cellxmax
@@ -163,13 +174,14 @@ function set_mu(mu, Qbase, cellxmax, cellymax, specific_heat_ratio, Rd)
     return mu
 end
 
-
+# ------------------------------------
+# set thermal Conductivity by Sutherland's formula
+# https://doi.org/10.11357/jsam1937.37.694
+# ------------------------------------
 function set_lambda(lambda, Qbase, cellxmax, cellymax, mu, specific_heat_ratio, Rd)
-    # サザーランドの式
-    # https://doi.org/10.11357/jsam1937.37.694
-    lam0 = 22.3*10^(-3)  # 基準熱伝導率　[W/mK]
-    T0 = 273.15          # 基準温度[K]
-    C = 125              # サザーランド定数[K]
+    lam0 = 22.3*10^(-3)  # Reference thermal Conductivity, W/(m K)
+    T0   = 273.15        # Reference Temperature, K
+    C    = 125           # Sutherland's constant, K
 
     for j in 1:cellymax
         for i in 1:cellxmax
@@ -181,6 +193,9 @@ function set_lambda(lambda, Qbase, cellxmax, cellymax, mu, specific_heat_ratio, 
     return lambda
 end
 
+# ------------------------------------
+# set Minf for AUSM+up (don't use)
+# ------------------------------------
 function set_Minf(bdcon, specific_heat_ratio, Rd)
     rho = 0 
     u   = 0 
@@ -209,7 +224,9 @@ function set_Minf(bdcon, specific_heat_ratio, Rd)
     return M
 end
 
-
+# ------------------------------------
+# Conversion from primitive variables to conserved variables
+# ------------------------------------
 function base_to_conservative(Qbase, Qcon, cellxmax, cellymax, specific_heat_ratio)
     """
     Qbase=[rho,u,v,p]
@@ -227,6 +244,9 @@ function base_to_conservative(Qbase, Qcon, cellxmax, cellymax, specific_heat_rat
     return Qcon
 end
 
+# ------------------------------------
+# Conversion from conserved variables to primitive variables
+# ------------------------------------
 function conservative_to_base(Qbase, Qcon, cellxmax, cellymax, specific_heat_ratio)
     """
     Qbase=[rho,u,v,p]
@@ -244,6 +264,9 @@ function conservative_to_base(Qbase, Qcon, cellxmax, cellymax, specific_heat_rat
     return Qbase
 end
 
+# ------------------------------------
+# Conversion from Cartesian coordinate system to general coordinate system
+# ------------------------------------
 function setup_Qcon_hat(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
     for l in 1:nval
         for j in 1:cellymax
@@ -255,6 +278,9 @@ function setup_Qcon_hat(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
     return Qcon_hat
 end
 
+# ------------------------------------
+# Conversion from general coordinate system to Cartesian coordinate system
+# ------------------------------------
 function Qhat_to_Q(Qcon, Qcon_hat, cellxmax, cellymax, volume, nval)
     for l in 1:nval
         for j in 1:cellymax

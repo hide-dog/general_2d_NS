@@ -1,3 +1,6 @@
+# ------------------------------------
+# set initial conditions
+# ------------------------------------
 function set_initQbase(Qbase, cellxmax, cellymax, restart_file, init_rho, init_u, init_v, init_p, init_T,
                     specific_heat_ratio, out_file_front, out_ext, out_dir, restartnum, Rd, nval)
 
@@ -56,6 +59,9 @@ function setup_restart_value(Qbase, cellxmax, cellymax, out_dir, restart_file, n
     return Qbase
 end
 
+# ------------------------------------
+# find out if results were diverge
+# ------------------------------------
 function check_divrege(Qbase, cellxmax, cellymax, Rd, fwrite)
     ite = 0
     for j in 2:cellymax-1

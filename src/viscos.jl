@@ -1,3 +1,6 @@
+# ------------------------------------
+# calcucation of the viscosity term by central difference
+# ------------------------------------
 function central_diff(E_vis_hat, F_vis_hat, Qbase, Qcon, cellxmax, cellymax, mu, lambda,
                         vecAx, vecAy, specific_heat_ratio, volume, Rd, nval)
     

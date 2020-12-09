@@ -1,3 +1,6 @@
+# ------------------------------------
+# time integration with explicit methods
+# ------------------------------------
 function time_integration_explicit(dt, Qcon_hat, RHS, cellxmax, cellymax, nval)
     Threads.@threads for l in 1:nval
         for j in 2:cellymax-1
@@ -9,9 +12,11 @@ function time_integration_explicit(dt, Qcon_hat, RHS, cellxmax, cellymax, nval)
     return Qcon_hat
 end 
 
-function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shig, B_beta_shig,
+# ------------------------------------
+# Calculation of the advection Jacobian matrix by one-wave approximation for lusgs
+# ------------------------------------
+function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shig, B_beta_shig, I,
                     Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_ratio, volume, nval)
-    # セル中心のonewave
     beta = 1.1
 
     for j in 2:cellymax
@@ -39,6 +44,7 @@ function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shi
                 b1c2 = 0.5*q2*(g-1)
                 gebyrho = g*e/rho
 
+                # advection Jacobian matrix in the general coordinate system
                 jacob_temp[1,1] = 0.0
                 jacob_temp[1,2] = kx_av
                 jacob_temp[1,3] = ky_av
@@ -62,9 +68,8 @@ function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shi
                 c = (g*rho/p)^0.5
                 shigma = abs(Z) + c*(kx_av^2+ky_av^2)^0.5
 
-                I_temp = zeros(nval,nval)
                 for l in 1:nval
-                    I_temp[l,l] = beta * shigma
+                    I[l,l] = beta * shigma
                 end
 
                 if k == 1
@@ -88,14 +93,22 @@ function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shi
             end
         end
     end
+    
+    # reset
+    for l in 1:nval
+        I[l,l] = 1.0
+    end
 
     return A_adv_hat_p, A_adv_hat_m, B_adv_hat_p, B_adv_hat_m, A_beta_shig, B_beta_shig
 end
 
+# ------------------------------------
+# Calculation of the viscosity Jacobian matrix by center differential for lusgs
+# ------------------------------------
 function central_diff_jacobian(jalphaP, jbetaP, Qbase, Qcon, cellxmax, cellymax, mu, lambda,
                             vecAx, vecAy, specific_heat_ratio, volume, nval)
     
-    # 角セルの処理
+    # substitution to Corner cell
     Qbase[1,1,1] = 1.0
     Qbase[cellxmax,1,1] = 1.0
     Qbase[1,cellymax,1] = 1.0
@@ -122,19 +135,14 @@ function central_diff_jacobian(jalphaP, jbetaP, Qbase, Qcon, cellxmax, cellymax,
     return jalphaP, jbetaP
 end
 
-function lusgs(dt, dtau, Qcon_hat, Qconn_hat, delta_Q, A_adv_hat_p, A_adv_hat_m, B_adv_hat_p, B_adv_hat_m, A_beta_shig, B_beta_shig, jalphaP, jbetaP, RHS, cellxmax, cellymax, volume, nval)
-    D  = zeros(cellxmax, cellymax)
-    Lx = zeros(cellxmax, cellymax, nval, nval)
-    Ly = zeros(cellxmax, cellymax, nval, nval)
-    Ux = zeros(cellxmax, cellymax, nval, nval)
-    Uy = zeros(cellxmax, cellymax, nval, nval)
-    
-    I = zeros(nval, nval)
-    for i in 1:nval
-        I[i,i] = 1.0
-    end
-    
-    # L,U
+# ------------------------------------
+# lusgs
+# ------------------------------------
+function lusgs(D, Lx, Ly, Ux, Uy, LdQ, UdQ, RHS_temp, I, dt, dtau, Qcon_hat, Qconn_hat, delta_Q,
+                A_adv_hat_p,  A_adv_hat_m,  B_adv_hat_p,  B_adv_hat_m,  A_beta_shig,  B_beta_shig,
+                jalphaP,  jbetaP, RHS, cellxmax, cellymax, volume, nval)
+       
+    # calculate L and U
     for m in 1:nval
         for l in 1:nval
             for j in 1:cellymax
@@ -148,8 +156,6 @@ function lusgs(dt, dtau, Qcon_hat, Qconn_hat, delta_Q, A_adv_hat_p, A_adv_hat_m,
         end
     end
 
-    LdQ = zeros(cellxmax, cellymax, nval)
-    UdQ = zeros(cellxmax, cellymax, nval)
     for j in 2:cellymax-1
         for i in 2:cellxmax-1
             for l in 1:nval
@@ -168,7 +174,6 @@ function lusgs(dt, dtau, Qcon_hat, Qconn_hat, delta_Q, A_adv_hat_p, A_adv_hat_m,
         end
     end    
     
-    RHS_temp = zeros(cellxmax, cellymax, nval)
     # RHS
     for l in 1:nval    
         for j in 2:cellymax-1
@@ -192,6 +197,16 @@ function lusgs(dt, dtau, Qcon_hat, Qconn_hat, delta_Q, A_adv_hat_p, A_adv_hat_m,
         for j in 2:cellymax-1
             for i in 2:cellxmax-1
                 delta_Q[i,j,l] = delta_Q[i,j,l] - D[i,j]^(-1) * UdQ[i,j,l]
+            end
+        end
+    end
+
+    # reset
+    for l in 1:nval
+        for j in 2:cellymax-1
+            for i in 2:cellxmax-1
+                LdQ[i,j,l] = 0.0
+                UdQ[i,j,l] = 0.0                
             end
         end
     end

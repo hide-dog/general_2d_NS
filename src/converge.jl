@@ -1,3 +1,6 @@
+# ------------------------------------
+# calculate Residuals
+# ------------------------------------
 function set_res(Delta_Qcon_hat, Delta_Qcon_hat_temp, cellxmax, cellymax, nval)
     res = zeros(cellxmax, cellymax, nval)
     for l in 1:nval
@@ -7,10 +10,12 @@ function set_res(Delta_Qcon_hat, Delta_Qcon_hat_temp, cellxmax, cellymax, nval)
             end
         end
     end 
-
     return res
 end
 
+# ------------------------------------
+# calculate Residuals by norm-2
+# ------------------------------------
 function check_converge(res, RHS, cellxmax, cellymax, init_small, nval)
     norm2 = zeros(nval)
 

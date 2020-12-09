@@ -1,14 +1,16 @@
+# ------------------------------------
+# set boundary conditions
+# ------------------------------------
 function set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, g, nval)
-    """bdcon[i][j]
-        i : 境界番号(x-,x+ ,y-,y+)
-        j=1-6 : "bd1_con":"2",
-                "bd1_rho":"1.0",
-                "bd1_u"  :"300.0",
-                "bd1_v"  :"0.0",
-                "bd1_p"  :"1.0",
-                "bd1_N2" :"1.0",
-                "bd1_N"  :"0.0",
-                "bd1_T"  :"300.0",
+    """
+    bdcon[i][j]
+    i : bd number(x-, x+, y-, y+)
+    j=1-6 : "bd1_con":"2",
+            "bd1_rho":"1.0",
+            "bd1_u"  :"300.0",
+            "bd1_v"  :"0.0",
+            "bd1_p"  :"1.0",
+            "bd1_T"  :"300.0",
     """
 
     # bd1 = x-
@@ -56,6 +58,12 @@ function set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, g, nva
                 Qbase[1,j,l] = Qbase[cellxmax-1,j,l]
             end
         end
+    else
+        println("------------------------")
+        println(" boundary error ")
+        println(" please check boundary number ")
+        println("------------------------")
+        throw(UndefVarError(:x))
     end
 
     # bd2 = x+
@@ -102,6 +110,12 @@ function set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, g, nva
                 Qbase[cellxmax,j,l] = Qbase[2,j,l]
             end
         end
+    else
+        println("------------------------")
+        println(" boundary error ")
+        println(" please check boundary number ")
+        println("------------------------")
+        throw(UndefVarError(:x))
     end
 
     # bd3 = y-
@@ -165,6 +179,12 @@ function set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, g, nva
             p  = Qbase[i,1,4]
             Qbase[i,1,1] = p/(Tw*Rd)
         end
+    else
+        println("------------------------")
+        println(" boundary error ")
+        println(" please check boundary number ")
+        println("------------------------")
+        throw(UndefVarError(:x))
     end
 
     # bd4 = y+
@@ -251,6 +271,12 @@ function set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, g, nva
                 Qbase[i,cellymax,l] = Qbase[i,cellymax-1,l]
             end
         end
+    else
+        println("------------------------")
+        println(" boundary error ")
+        println(" please check boundary number ")
+        println("------------------------")
+        throw(UndefVarError(:x))
     end
 
     return Qbase

@@ -1,5 +1,8 @@
 using Printf
 
+# ------------------------------------
+# output results
+# ------------------------------------
 function output_result(stepnum, Qbase, cellxmax, cellymax, specific_heat_ratio, out_file_front, out_ext, out_dir, Rd, nval)
     
     stepnum = string(stepnum)

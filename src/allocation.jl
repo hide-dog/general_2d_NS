@@ -48,7 +48,18 @@ function allocation_implicit(cellxmax, cellymax, nval)
     jbetaP  = zeros(cellxmax, cellymax)                 # Jacobian matrix for viscosity
 
     delta_Q      = zeros(cellxmax, cellymax, nval)      # delta Q for lusgs
-    delta_Q_temp = zeros(cellxmax, cellymax, nval)      # delta Q for lusgs
+    delta_Q_temp = zeros(cellxmax, cellymax, nval)      # temporary delta Q for lusgs
+
+    D  = zeros(cellxmax, cellymax)                      # Diagonal of LHS
+    Lx = zeros(cellxmax, cellymax, nval, nval)          # lower of LHS
+    Ly = zeros(cellxmax, cellymax, nval, nval)          # lower of LHS
+    Ux = zeros(cellxmax, cellymax, nval, nval)          # upper of LHS
+    Uy = zeros(cellxmax, cellymax, nval, nval)          # upper of LHS
+
+    LdQ = zeros(cellxmax, cellymax, nval)               # lower of LHS
+    UdQ = zeros(cellxmax, cellymax, nval)               # upper of LHS
+
+    RHS_temp = zeros(cellxmax, cellymax, nval)          # temporary RHS
 
     # define at cell boundaries
     lambda_facex = zeros(cellxmax+1, cellymax)          # lambda for computational time steps
@@ -56,8 +67,13 @@ function allocation_implicit(cellxmax, cellymax, nval)
 
     # misc
     norm2 = zeros(nval)                                 # Residuals by norm-2
+    I = zeros(nval, nval)                               # identity matrix
+    for l in 1:nval
+        I[l,l] = 1.0
+    end
 
     return Qbasen, Qconn, Qconn_hat, Qbasem, dtau, lambda_facex, lambda_facey,
             A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shig, B_beta_shig,
-            jalphaP, jbetaP, delta_Q, delta_Q_temp, norm2
+            jalphaP, jbetaP, delta_Q, delta_Q_temp, D, Lx, Ly, Ux, Uy, LdQ, UdQ, RHS_temp,
+            norm2, I
 end

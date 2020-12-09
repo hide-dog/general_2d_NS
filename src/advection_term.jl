@@ -1,10 +1,18 @@
+# ------------------------------------
+# advection term by AUSM+
+# ------------------------------------
 function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx, vecAy, specific_heat_ratio, volume, nval)
     g         = specific_heat_ratio
+    cell_vecAx = zeros(2)     # vecAx at cell center
+    cell_vecAy = zeros(2)     # vecAy at cell center
+    temp_vecX = zeros(nval)   # vecAx used for the pressure term
+    temp_vecY = zeros(nval)   # vecAx used for the pressure term
+    Lpsi = zeros(nval)        
+    Rpsi = zeros(nval)
     
     for j in 2:cellymax -1
         for i in 2:cellxmax+1 -1
-            # i-1セル
-            cell_vecAx = zeros(2)
+            # i-1 cell
             cell_vecAx[1] = 0.5*(vecAx[i-1,j,1]+vecAx[i,j,1])
             cell_vecAx[2] = 0.5*(vecAx[i-1,j,2]+vecAx[i,j,2])
             
@@ -12,13 +20,11 @@ function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx,
             UL = Qcon[i-1,j,2] / Qcon[i-1,j,1]*cell_vecAx[1] + Qcon[i-1,j,3] / Qcon[i-1,j,1]*cell_vecAx[2]
             pL = Qbase[i-1,j,4]
             
-            # iセル
-            cell_vecAx = zeros(2)
+            # i cell
             cell_vecAx[1] = 0.5*(vecAx[i,j,1]+vecAx[i+1,j,1])
             cell_vecAx[2] = 0.5*(vecAx[i,j,2]+vecAx[i+1,j,2])
             
             rhoR = Qbase[i,j,1]
-            #UR = Qbase[i,j,2]*cell_vecAx[1] + Qbase[i,j,3]*cell_vecAx[2]
             UR = Qcon[i,j,2] / Qcon[i,j,1]*cell_vecAx[1] + Qcon[i,j,3] / Qcon[i,j,1]*cell_vecAx[2]
             pR = Qbase[i,j,4]
             
@@ -26,12 +32,8 @@ function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx,
             mdot, ph = AUSM_plus_half(rhoL, rhoR, UL, UR, pL, pR, g)
 
             # flux half
-            temp_vecX = zeros(nval)
             temp_vecX[2] = vecAx[i,j,1]
             temp_vecX[3] = vecAx[i,j,2]
-
-            Lpsi = zeros(nval)
-            Rpsi = zeros(nval)
 
             for l in 1:nval
                 Lpsi[l] = Qcon[i-1,j,l] / Qcon[i-1,j,1]
@@ -54,9 +56,7 @@ function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx,
 
     for j in 2:cellymax+1 -1
         for i in 2:cellxmax -1
-        
-            # j-1セル
-            cell_vecAy = zeros(2)
+            # j-1 cell
             cell_vecAy[1] = 0.5*(vecAy[i,j-1,1]+vecAy[i,j,1])
             cell_vecAy[2] = 0.5*(vecAy[i,j-1,2]+vecAy[i,j,2])
             
@@ -64,8 +64,7 @@ function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx,
             VL = Qbase[i,j-1,2]*cell_vecAy[1] + Qbase[i,j-1,3]*cell_vecAy[2]
             pL = Qbase[i,j-1,4]
             
-            # jセル
-            cell_vecAy = zeros(2)
+            # j cell
             cell_vecAy[1] = 0.5*(vecAy[i,j,1]+vecAy[i,j+1,1])
             cell_vecAy[2] = 0.5*(vecAy[i,j,2]+vecAy[i,j+1,2])
             
@@ -77,12 +76,8 @@ function AUSM_plus(E_adv_hat, F_adv_hat, Qbase, Qcon, cellxmax, cellymax, vecAx,
             mdot, ph = AUSM_plus_half(rhoL, rhoR, VL, VR, pL, pR, g)
             
             # flux half
-            temp_vecY = zeros(nval)
             temp_vecY[2] = vecAy[i,j,1]
             temp_vecY[3] = vecAy[i,j,2]
-
-            Lpsi = zeros(nval)
-            Rpsi = zeros(nval)
 
             for l in 1:nval
                 Lpsi[l] = Qcon[i,j-1,l] / Qcon[i,j-1,1]
