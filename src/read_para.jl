@@ -44,7 +44,7 @@ function read_para(dict)
     restartnum   = Int(parse(Float64,restartnum))
     
     # output
-    init_small　=　parse(Float64,dict["init_small"])
+    init_small  = 1.0e-50
     norm_ok   　=　parse(Float64,dict["norm_ok"])
     
     # time step
@@ -53,7 +53,6 @@ function read_para(dict)
     dt           = parse(Float64,dict["dt"])
     every_outnum = Int(parse(Float64,dict["every_outnum"]))
     in_nt        = Int(parse(Float64,dict["inner_step"]))
-    dtau         = parse(Float64,dict["dtau"])
     cfl          = parse(Float64,dict["CFL"])
     
     # Initial values
@@ -62,11 +61,16 @@ function read_para(dict)
     init_v   = parse(Float64,dict["init_v"])
     init_p   = parse(Float64,dict["init_p"])
     init_T   = parse(Float64,dict["init_T"])
+    use_pt   = Int(parse(Float64,dict["use_pt"]))
 
     # constant    
-    specific_heat_ratio = parse(Float64,dict["specific_heat_ratio"])
+    specific_heat_ratio = parse(Float64,dict["g"])
     Rd = parse(Float64,dict["Rd"])
-
+    
+    if use_pt == 2
+        init_p = init_rho * Rd * init_T
+    end
+    
     # boundary conditions
     #= 
     bdcon[i][j]
@@ -92,7 +96,7 @@ function read_para(dict)
     end
     
     return out_file_front, out_ext, restartnum, Restart_file, init_small, norm_ok,
-            time_integ, nt, dt, every_outnum, in_nt, dtau, cfl,
+            time_integ, nt, dt, every_outnum, in_nt, cfl,
             init_rho, init_u, init_v, init_p, init_T, specific_heat_ratio, Rd, bdcon
 end
 
@@ -100,11 +104,11 @@ function input_para(PARAMDAT)
     read_PARAMDAT = make_json(PARAMDAT)
     dict          = read_json(read_PARAMDAT)
     out_file_front, out_ext, restartnum, Restart_file, init_small, norm_ok,
-    time_integ, nt, dt, every_outnum, in_nt, dtau, cfl,
+    time_integ, nt, dt, every_outnum, in_nt, cfl,
     init_rho, init_u, init_v, init_p, init_T, specific_heat_ratio, Rd, bdcon = read_para(dict)
     println("fin reading para")
 
     return out_file_front, out_ext, restartnum, Restart_file, init_small, norm_ok,
-            time_integ, nt, dt, every_outnum, in_nt, dtau, cfl,
+            time_integ, nt, dt, every_outnum, in_nt, cfl,
             init_rho, init_u, init_v, init_p, init_T, specific_heat_ratio, Rd, bdcon
 end

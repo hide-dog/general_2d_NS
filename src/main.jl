@@ -11,13 +11,12 @@ function main()
     fwrite   = "write"          # write file 
     
     nval = 4         # number of conserved variables
-    Rd   = 287.0     # gas constant of air, J/(kg K)
     R    = 8.314     # gas constant, J/(K mol)
     
     # read grids and parameter
     xmax, ymax, nodes, vecAx, vecAy = read_allgrid()
     out_file_front, out_ext, restartnum, restart_file, init_small, norm_ok,
-    time_integ, nt, dt, every_outnum, in_nt, dtau, cfl,
+    time_integ, nt, dt, every_outnum, in_nt, cfl,
     init_rho, init_u, init_v, init_p, init_T, specific_heat_ratio, Rd, bdcon = input_para(PARAMDAT)
     
     # number of cells
@@ -31,6 +30,7 @@ function main()
     # set initial condition
     Qbase, restartnum = set_initQbase(Qbase, cellxmax, cellymax, restart_file, init_rho, init_u, init_v, init_p, init_T,
                                       specific_heat_ratio, out_file_front, out_ext, out_dir, restartnum, Rd, nval)
+    Qbase    = set_boundary(Qbase, cellxmax, cellymax, vecAx, vecAy, bdcon, Rd, specific_heat_ratio, nval)
     
     # set volume, dx and dy
     volume = set_volume(nodes, cellxmax, cellymax, volume)

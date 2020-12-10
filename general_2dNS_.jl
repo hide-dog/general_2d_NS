@@ -1,6 +1,8 @@
 # src path
-src_path = "C:\\Users\\xxxx\\Desktop\\git\\general_2d_NS\\src\\"
-src_path = "C:\\Users\\hidee\\Desktop\\git\\general_2d_NS\\src\\"
+#src_path = "C:\\Users\\xxxx\\Desktop\\git\\general_2d_NS\\src\\"
+#src_path = "C:\\Users\\hidee\\Desktop\\git\\general_2d_NS\\src\\"
+src_path = "C:\\Users\\Koike\\Desktop\\git\\general_2d_NS\\src\\"
+
 # main (変更しないこと)
 src_read="read_grid.jl"
 include(src_path*src_read)

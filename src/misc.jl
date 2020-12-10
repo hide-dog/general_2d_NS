@@ -53,7 +53,7 @@ function setup_restart_value(Qbase, cellxmax, cellymax, out_dir, restart_file, n
             for l in 1:nval
                 Qbase[i,j,l] = parse(Float64,temp[l]) 
             end
-            k = k+1
+            k = k + 1
         end
     end
     return Qbase

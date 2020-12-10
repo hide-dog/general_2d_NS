@@ -68,23 +68,19 @@ function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shi
                 c = (g*rho/p)^0.5
                 shigma = abs(Z) + c*(kx_av^2+ky_av^2)^0.5
 
-                for l in 1:nval
-                    I[l,l] = beta * shigma
-                end
-
                 if k == 1
                     for m in 1:nval
                         for l in 1:nval                        
-                            A_adv_hat_p[i,j,l,m] = 0.5*(jacob_temp[l,m] + I_temp[l,m])
-                            A_adv_hat_m[i,j,l,m] = 0.5*(jacob_temp[l,m] - I_temp[l,m])
+                            A_adv_hat_p[i,j,l,m] = 0.5*(jacob_temp[l,m] + I[l,m] * beta * shigma)
+                            A_adv_hat_m[i,j,l,m] = 0.5*(jacob_temp[l,m] - I[l,m] * beta * shigma)
                         end
                     end
                     A_beta_shig[i,j] = beta * shigma
                 elseif k ==2                    
                     for m in 1:nval
                         for l in 1:nval
-                            B_adv_hat_p[i,j,l,m] = 0.5*(jacob_temp[l,m] + I_temp[l,m])
-                            B_adv_hat_m[i,j,l,m] = 0.5*(jacob_temp[l,m] - I_temp[l,m])
+                            B_adv_hat_p[i,j,l,m] = 0.5*(jacob_temp[l,m] + I[l,m] * beta * shigma)
+                            B_adv_hat_m[i,j,l,m] = 0.5*(jacob_temp[l,m] - I[l,m] * beta * shigma)
                         end
                     end
                     B_beta_shig[i,j] = beta * shigma
@@ -92,11 +88,6 @@ function one_wave(A_adv_hat_m, A_adv_hat_p, B_adv_hat_m, B_adv_hat_p, A_beta_shi
 
             end
         end
-    end
-    
-    # reset
-    for l in 1:nval
-        I[l,l] = 1.0
     end
 
     return A_adv_hat_p, A_adv_hat_m, B_adv_hat_p, B_adv_hat_m, A_beta_shig, B_beta_shig

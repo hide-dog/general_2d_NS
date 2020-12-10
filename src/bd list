@@ -1,12 +1,22 @@
 boundary condition
 
 0 = inlet
+(use rho,u,v,p)
+
 1 = outlet
+(don't use all values)
+
 2 = slip wall
 3 = non-slip wall
-4 = symmetric conditions
+(don't use all values)
 
-5 = inlet for O grid(use pressure)
-6 = inlet for O grid(use Temperature)
+4 = symmetric conditions
+(don't use all values)
+
+5 = inlet for O grid
+(use rho,u,v,p)
+6 = inlet for O grid
+(use rho,u,v,T)
 
 7 = non-slip isothermal wall
+(use T)
