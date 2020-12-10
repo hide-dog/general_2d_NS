@@ -1,3 +1,6 @@
-# NACA4412
+# How to use (NACA4412)
+Put the files other than README in one previous directory  
+Run the analysis according to README.md  
+
 README以外のファイルを一つ前のディレクトリに置く  
 README.mdに沿って解析を実行する  
