@@ -1,15 +1,15 @@
 # general_2d_NS
 
 How to use this code  
-1 Put general_2d_NS anywhere you want  
-2 Change the src_path in general_2d_NS.jl  
+1 Put "general_2d_NS" anywhere you want  
+2 Change the src_path in "general_2d_NS.jl"  
 　　Specify the absolute path up to and including the src folder  
-3 Change the number of cells etc. in pre.jl and run  
+3 Change the number of cells etc. in "pre.jl" and run  
 4 Specify the number of threads by running the following at the windows command prompt  
   However, due to the small number of grids, 2 or 1 is fine  
 　　set JULIA_NUM_THREADS=1  
-5 Run general_2d_NS.jl  
-6 Run post.jl  
+5 Run "general_2d_NS.jl"  
+6 Run "post.jl"  
 7 Post_result folder has the result, visualize them using paraview  
   
 コードの使い方  
