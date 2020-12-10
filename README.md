@@ -1,6 +1,6 @@
 # general_2d_NS
 
-##How to use this code  
+How to use this code  
   
 1 Put "general_2d_NS" anywhere you want  
   
@@ -23,10 +23,11 @@
 7 Post_result folder has the result, visualize them using paraview  
   
   
-  
-  
+  <br>
+  <br>
+  <br>
     
-##コードの使い方  
+コードの使い方  
   
 1　general_2d_NSを好きなところに置く  
   
