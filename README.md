@@ -23,7 +23,9 @@ How to use this code
 7 Post_result folder has the result, visualize them using paraview  
   
   
-   
+  
+  
+    
 コードの使い方  
   
 1　general_2d_NSを好きなところに置く  
